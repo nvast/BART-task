@@ -1,0 +1,29 @@
+.photo-card{
+    width: 15rem;
+    height: 15rem;
+    display: flex;
+    align-items: center;
+    margin: 1rem;
+    position: relative;
+}
+.photo-card img{
+    width: 15rem;
+    height: 15rem;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.photo-card svg{
+    color: grey;
+    border-radius: 50%;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    z-index: 1;
+    cursor: pointer;
+}
+
+.photo-card svg:hover{
+    background-color: azure;
+    transition: background-color 0.5s ease;
+}

@@ -1,0 +1,58 @@
+h1, h4 {
+    margin: 1rem
+}
+
+.container{
+    width: 69.5rem;
+    height: 100%;
+    /* background-color: aqua; */
+    padding-top: 2rem;
+}
+
+.gallery{
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    flex-wrap: wrap;    
+    flex-direction: row;
+}
+
+.card{
+    width: 15rem;
+    height: 15rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 1rem;
+}
+
+.card img{
+    height: 12rem;
+    width: 15rem;
+    cursor: pointer;
+    object-fit: cover;
+}
+
+.card h6{
+    margin: auto;
+}
+
+.card-add{
+    cursor: pointer;
+}
+
+.delete-icon{
+    color: grey;
+    border-radius: 50%;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    z-index: 1;
+    cursor: pointer;
+}
+
+.delete-icon:hover{
+    background-color: azure;
+    transition: background-color 0.5s ease;
+}
+
