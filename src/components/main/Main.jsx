@@ -54,7 +54,7 @@ export default function Main() {
     // }, [])
     //
     async function getBackendGalleries() {
-        const backendApi = "";
+        const backendApi = "/gallery";
         try {
             const response = await axios.get(backendApi);
             const backendGalleries = response.data;
@@ -71,7 +71,7 @@ export default function Main() {
     }
 
     async function createBackendGallery() {
-        const backendApi = "";
+        const backendApi = "/gallery";
         try {
             await axios.post(backendApi, { "name": backendGalleryName[backendGalleryName.length - 1] })
         } catch (error) {
