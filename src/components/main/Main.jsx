@@ -106,7 +106,7 @@ export default function Main() {
             <div className="gallery">
                 {galleryName.map((element, index) => (
                     <Card className="card animate__animated animate__fadeIn" key={index}>
-                        <Link to={`/${element}`}>
+                        <Link to={`/gallery/${element}`}>
                             <img src={coverPhotos[index]} alt={element} />
                         </Link>
                         <ClearRoundedIcon className="delete-icon" onClick={() => handleDeleteGallery(index)} />
@@ -116,7 +116,7 @@ export default function Main() {
                 {/* photos from backend */}
                 { /* backendGalleryName.map((element, index) => (
                         <Card className="photo-card animate__animated animate__fadeIn" key={index}>
-                            <Link to={`/${element}`}>
+                            <Link to={`/gallery/${element}`}>
                                 <img src={backendGalleryPhotos[index]} alt={element} />
                             </Link>
                             <ClearRoundedIcon className="delete-icon" onClick={() => handleDeleteBackendGalery(element)} />

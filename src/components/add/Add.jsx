@@ -20,7 +20,8 @@ import 'animate.css';
 export default function Add({ setGalleryName, setFiles, files }) {
 
     const [open, setOpen] = React.useState(false);
-    const [inputValue, setInputValue] = React.useState("")
+    const [inputValue, setInputValue] = React.useState("");
+    const [warning, setWarning] = React.useState(false);
     const [selectedFiles, setSelectedFiles] = React.useState([]);
 
     const onDrop = useCallback((acceptedFiles) => {
@@ -40,12 +41,16 @@ export default function Add({ setGalleryName, setFiles, files }) {
     const params = useParams().path
 
     function handleSubmit() {
-        setGalleryName(prevs => [...prevs, inputValue])
-        setOpen(false)
-        setInputValue("")
+        if (inputValue.includes("/")) {
+            setWarning(true)
+        } else {
+            setGalleryName(prevs => [...prevs, inputValue])
+            setOpen(false)
+            setInputValue("")
+        }
     }
 
-    async function handleAddPhotos(){
+    async function handleAddPhotos() {
         setFiles(prevs => [...prevs, ...selectedFiles])
         setOpen(false)
         // handle backend
@@ -56,17 +61,17 @@ export default function Add({ setGalleryName, setFiles, files }) {
         // selectedFiles.forEach((file) => {
         //   formData.append('image', file.path);
         // });
-      
+
         // const headers = {
         //   'Content-Type': 'multipart/form-data; boundary=--boundary'
         // };
-      
+
         // try {
         //     await axios.post(backendApi, formData, { headers })
         // } catch (error) {
         //     console.error('Error uploading photos:', error);
         // }
-        
+
         setSelectedFiles([])
     }
 
@@ -116,7 +121,7 @@ export default function Add({ setGalleryName, setFiles, files }) {
                                             className="added-photos"
                                             alt="image"
                                         />
-                                        <CancelIcon onClick={() => setSelectedFiles(prevs => prevs.filter((a, b) => b !== index))}/>
+                                        <CancelIcon onClick={() => setSelectedFiles(prevs => prevs.filter((a, b) => b !== index))} />
                                     </div>
                                 ))}
                             </div>
@@ -133,6 +138,9 @@ export default function Add({ setGalleryName, setFiles, files }) {
                     }
 
                 </DialogContent>
+
+                <p className="warning" style={{ display: warning ? "block" : "none" }}>Názov nemôže obsahovať znak " / "</p>
+
                 <DialogActions>
                     <Button
                         onClick={params ? handleAddPhotos : handleSubmit}

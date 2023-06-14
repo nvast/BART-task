@@ -11,7 +11,7 @@ root.render(
   <BrowserRouter>
       <Routes>
         <Route index path="/" element={<App />} />
-        <Route path="/:path" element={<Gallery />} />
+        <Route path="/gallery/:path" element={<Gallery />} />
       </Routes>
   </BrowserRouter>
 );
