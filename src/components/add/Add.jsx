@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useDropzone } from 'react-dropzone'
 import "./add.css";
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
@@ -14,15 +14,17 @@ import TextField from '@mui/material/TextField';
 import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { useParams } from "react-router-dom";
+import axios from "axios";
 import 'animate.css';
 
 
-export default function Add({ setGalleryName, setFiles, files }) {
+export default function Add({ createGallery, setFiles, files, galleryItems }) {
 
-    const [open, setOpen] = React.useState(false);
-    const [inputValue, setInputValue] = React.useState("");
-    const [warning, setWarning] = React.useState(false);
-    const [selectedFiles, setSelectedFiles] = React.useState([]);
+    const [open, setOpen] = useState(false);
+    const [inputValue, setInputValue] = useState("");
+    const [warning, setWarning] = useState(false);
+    const [exist, setExist] = useState(false);
+    const [selectedFiles, setSelectedFiles] = useState([]);
 
     const onDrop = useCallback((acceptedFiles) => {
 
@@ -31,9 +33,7 @@ export default function Add({ setGalleryName, setFiles, files }) {
                 Object.assign(file, { preview: URL.createObjectURL(file) })
             );
             setSelectedFiles(prevs => [...prevs, ...updatedFiles]);
-
         }
-
     }, [])
 
     const { getRootProps, getInputProps } = useDropzone({ onDrop })
@@ -41,10 +41,14 @@ export default function Add({ setGalleryName, setFiles, files }) {
     const params = useParams().path
 
     function handleSubmit() {
+        const exists = galleryItems.some(element => element.name === inputValue);
+
         if (inputValue.includes("/")) {
             setWarning(true)
+        } else if (exists) {
+            setExist(true)
         } else {
-            setGalleryName(prevs => [...prevs, inputValue])
+            createGallery(inputValue)
             setOpen(false)
             setInputValue("")
         }
@@ -53,24 +57,23 @@ export default function Add({ setGalleryName, setFiles, files }) {
     async function handleAddPhotos() {
         setFiles(prevs => [...prevs, ...selectedFiles])
         setOpen(false)
-        // handle backend
-        //
-        // const backendApi = `/gallery/${path}`;
-        // const formData = new FormData();
 
-        // selectedFiles.forEach((file) => {
-        //   formData.append('image', file.path);
-        // });
+        const backendApi = `http://api.programator.sk/gallery/${params}`;
+        const formData = new FormData();
 
-        // const headers = {
-        //   'Content-Type': 'multipart/form-data; boundary=--boundary'
-        // };
+        selectedFiles.forEach((file, index) => {
+            formData.append(`images[${index}]`, file);
+          });
 
-        // try {
-        //     await axios.post(backendApi, formData, { headers })
-        // } catch (error) {
-        //     console.error('Error uploading photos:', error);
-        // }
+        const headers = {
+          'Content-Type': 'multipart/form-data; boundary=--boundary'
+        };
+
+        try {
+            await axios.post(backendApi, formData, { headers });
+        } catch (error) {
+            console.error('Error uploading photos:', error);
+        }
 
         setSelectedFiles([])
     }
@@ -140,7 +143,7 @@ export default function Add({ setGalleryName, setFiles, files }) {
                 </DialogContent>
 
                 <p className="warning" style={{ display: warning ? "block" : "none" }}>Názov nemôže obsahovať znak " / "</p>
-
+                <p className="warning" style={{ display: exist ? "block" : "none" }}>Galéria s týmto názvom už existuje.</p>
                 <DialogActions>
                     <Button
                         onClick={params ? handleAddPhotos : handleSubmit}

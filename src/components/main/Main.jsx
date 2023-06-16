@@ -1,101 +1,59 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import "./main.css";
-import { createClient } from 'pexels';
 import Card from '@mui/material/Card';
 import ClearRoundedIcon from '@mui/icons-material/ClearRounded';
 import { Link } from 'react-router-dom';
 import Add from "../add/Add";
-import pureBlack from "./images/pure black.jpg";
 import axios from "axios";
+import pureBlack from "./images/pure black.jpg"
 import 'animate.css';
 
 export default function Main() {
-    const [galleryName, setGalleryName] = useState(["Nature", "Architecture", "People", "Food", "Abstract"]);
-    const [coverPhotos, setCoverPhotos] = useState([]);
-    const [backendGalleryName, setBackendGalleryName] = useState([]);
-    const [backendGalleryPhotos, setBackendGalleryPhotos] = useState([])
-    const client = createClient('HXmcARPuClkJUcyiSmw7BFDtZtLy4UAydLwou0weXQLfV5a1YQnSD0y6');
+    const [galleryItems, setGalleryItems] = useState([]);
 
     useEffect(() => {
-        getPhotos();
-        // createBackendGallery()
-    }, [galleryName]);
+        getGalleries();
+    }, [])
 
-    // default option without backend, get 5 ramdom photos from pexels
-    async function getPhotos() {
-        const promises = galleryName.map(async (element) => {
-            try {
-                const response = await client.photos.search({ query: element, per_page: 1 });
-                return response.photos[0].src.large;
-            } catch {
-                return pureBlack
-            }
-
-        });
-
-        const photos = await Promise.all(promises);
-        setCoverPhotos(photos);
-    }
-
-    function handleDeleteGallery(index) {
-        const removeName = [...galleryName]
-        removeName.splice(index, 1)
-        setGalleryName([...removeName])
-
-        const removePhoto = [...coverPhotos]
-        removePhoto.splice(index, 1)
-        setCoverPhotos([...removePhoto])
-    }
-
-    // option with backend
-    //
-    // useEffect(() => {
-    //     getBackendGalleries();
-    // }, [])
-    //
-    async function getBackendGalleries() {
-        const backendApi = "/gallery";
+    async function getGalleries() {
+        const backendApi = "http://api.programator.sk/gallery";
         try {
             const response = await axios.get(backendApi);
-            const backendGalleries = response.data;
-            setBackendGalleryName(prevs => [...prevs, ...backendGalleries.map(element => element.gallery.name)]);
-            setBackendGalleryPhotos(prevs => [...prevs, ...backendGalleries.map(element => element.images[0].path)]);
-
+            const data = response.data.galleries.filter(
+                (element) => element.path !== "test"
+            );
+            setGalleryItems(data)
         } catch (error) {
-            if (error.response && error.response.status === 500) {
-                console.error("Internal Server Error");
-            } else {
-                console.error("Error occurred:", error.message);
-            }
+            console.error(error.message);
         }
     }
 
-    async function createBackendGallery() {
-        const backendApi = "/gallery";
+    async function createGallery(galleryName) {
+        const backendApi = "http://api.programator.sk/gallery";
         try {
-            await axios.post(backendApi, { "name": backendGalleryName[backendGalleryName.length - 1] })
+            const headers = {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            };
+            await axios.post(backendApi, { name: galleryName }, headers);
+
+            getGalleries();
+
         } catch (error) {
-            if (error.response && error.response.status === 400) {
-                console.error("Invalid request. The request doesn't conform to the schema:", error.message)
-            } else if (error.response && error.response.status === 409) {
-                console.error("Gallery with this name already exists:", error.message)
-            } else {
-                console.error("Error occurred:", error.message);
-            }
+            console.error(error.message);
+
         }
     }
 
-    async function handleDeleteBackendGalery(name) {
-        const backendApi = `/gallery?name=${name}`
+    async function handleDelete(name) {
+        const backendApi = `http://api.programator.sk/gallery/${name}`
         try {
             await axios.delete(backendApi)
-        } catch (error) {
-            if (error.response && error.response.status === 400) {
-                console.error("Photo doesnt exist:", error.message)
-            } else {
-                console.error("Internal Server Error");
-            }
+            getGalleries()
 
+        } catch (error) {
+            console.error(error.message);
         }
     }
 
@@ -104,26 +62,20 @@ export default function Main() {
             <h1>Fotogaléria</h1>
             <h4>Kategórie</h4>
             <div className="gallery">
-                {galleryName.map((element, index) => (
+                {galleryItems.map((element, index) => (
                     <Card className="card animate__animated animate__fadeIn" key={index}>
-                        <Link to={`/gallery/${element}`}>
-                            <img src={coverPhotos[index]} alt={element} />
+                        <Link to={`/${element.path}`}>
+                            <img 
+                            src={element.image ? `http://api.programator.sk/images/0x700/${element.image.fullpath}` : pureBlack} 
+                            alt={element.name} 
+                            loading="lazy"
+                            />
                         </Link>
-                        <ClearRoundedIcon className="delete-icon" onClick={() => handleDeleteGallery(index)} />
-                        <h6>{element}</h6>
+                        <ClearRoundedIcon className="delete-icon" onClick={() => handleDelete(element.name)} />
+                        <h6>{element.name}</h6>
                     </Card>
                 ))}
-                {/* photos from backend */}
-                { /* backendGalleryName.map((element, index) => (
-                        <Card className="photo-card animate__animated animate__fadeIn" key={index}>
-                            <Link to={`/gallery/${element}`}>
-                                <img src={backendGalleryPhotos[index]} alt={element} />
-                            </Link>
-                            <ClearRoundedIcon className="delete-icon" onClick={() => handleDeleteBackendGalery(element)} />
-                            <h6>{element}</h6>
-                        </Card>
-                    )) */ }
-                <Add setGalleryName={setGalleryName} />
+                <Add createGallery={createGallery} galleryItems={galleryItems} />
             </div>
         </div>
     );
