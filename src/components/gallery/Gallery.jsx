@@ -16,6 +16,7 @@ export default function Gallery() {
     const query = path.path
     const [galleryPhotos, setGalleryPhotos] = useState([]);
     const [files, setFiles] = useState([]);
+    const [loading, setLoading] = useState(true);
     //lightbox
     const [open, setOpen] = useState(false);
     const [galleryObjects, setGalleryObjects] = useState([]);
@@ -79,10 +80,13 @@ export default function Gallery() {
                     {galleryPhotos.map((element, index) => (
                         <Card className="photo-card animate__animated animate__fadeIn" key={index}>
                             <img 
-                            src={element.preview ? element.preview :`http://api.programator.sk/images/0x700/${query}/${element.path}`} 
+                            src={element.preview ? element.preview : loading ? `http://api.programator.sk/images/0x5/${query}/${element.path}` : `http://api.programator.sk/images/0x700/${query}/${element.path}`} 
                             alt="galery img" 
                             onClick={() => { setOpen(true); setLightboxIndex(index) }} 
-                            loading="lazy"/>
+                            loading="lazy"
+                            onLoad={() => {setLoading(false)}}
+                            />
+                            
                             <ClearRoundedIcon onClick={() => handleDeletePhoto(index, element)} />
                         </Card>
                     ))}

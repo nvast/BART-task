@@ -10,6 +10,7 @@ import 'animate.css';
 
 export default function Main() {
     const [galleryItems, setGalleryItems] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         getGalleries();
@@ -66,7 +67,8 @@ export default function Main() {
                     <Card className="card animate__animated animate__fadeIn" key={index}>
                         <Link to={`/${element.path}`}>
                             <img 
-                            src={element.image ? `http://api.programator.sk/images/0x700/${element.image.fullpath}` : pureBlack} 
+                            src={element.image ? loading ? `http://api.programator.sk/images/0x5/${element.image.fullpath}` : `http://api.programator.sk/images/0x700/${element.image.fullpath}` : pureBlack}
+                            onLoad={() => {setLoading(false)}} 
                             alt={element.name} 
                             loading="lazy"
                             />
