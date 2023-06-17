@@ -133,6 +133,12 @@ export default function Add({ createGallery, setFiles, files, galleryItems }) {
                         :
                         <TextField
                             onChange={e => setInputValue(e.target.value)}
+                            onKeyDown={e => {
+                                if (e.key === "Enter"){
+                                    e.preventDefault();
+                                    handleSubmit()
+                                }
+                            } }
                             className="dialog-input"
                             label="Názov kategórie"
                             variant="outlined"
@@ -141,7 +147,6 @@ export default function Add({ createGallery, setFiles, files, galleryItems }) {
                     }
 
                 </DialogContent>
-
                 <p className="warning" style={{ display: warning ? "block" : "none" }}>Názov nemôže obsahovať znak " / "</p>
                 <p className="warning" style={{ display: exist ? "block" : "none" }}>Galéria s týmto názvom už existuje.</p>
                 <DialogActions>
